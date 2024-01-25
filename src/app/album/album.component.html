@@ -1,0 +1,71 @@
+<body>
+  <div class="bar">
+    <select [(ngModel)]="selectedCategory" name="category">
+      <option *ngFor="let category of categories" [ngValue]="category">{{ category.name }}</option>
+    </select>
+
+    <input type="file" id="file" (change)="onFileSelected($event)" multiple class="searchbar" hidden />
+    <label for="file">Upload images</label>
+    <button type="button" (click)="uploadImages()"><img class="upload" src="../../assets/images/upload.png"
+        alt="upload"></button>
+  </div>
+  <div class="container">
+    <div>
+      <h2 *ngIf="selectedCategory">{{ selectedCategory.name }}</h2>
+    </div>
+    <div class="category-container">
+      <!-- <input *ngIf="category" [(ngModel)]="newCategory" placeholder="New Category" /> -->
+      <button type="button" (click)="addCategory()" class="add-category-button">Add Category</button>
+      <button type="button" (click)="deleteCategory(selectedCategory.id)" class="delete-button">delete Category </button>
+      <!-- <button type="button" (click)="addCategory()" class="traiter-button">traiter </button> -->
+    </div>
+  </div>
+  <div class="imgCategorie">
+    <ng-container *ngFor="let image of images">
+      <div class="newdiv" *ngIf="selectedCategory.name === 'ALL' || image.category === selectedCategory.name">
+        <input type="checkbox" [value]="image.id" (change)="toggleImageSelection($event, image.id)">
+        <img [src]="image.imageData" alt="{{image.filename}}" (click)="selectImage(image)">
+      </div>
+    </ng-container>
+
+  </div>
+  <div>
+    <input type="file" (change)="Selected($event)" />
+  </div>
+  <div *ngIf="selectedImage">
+    <h2>Selected Image Preview</h2>
+    <img [src]="selectedImage" alt="Selected Image" style="width: 200px; height: auto; margin: 5px;" />
+  </div>
+  <div *ngIf="similarImages.length > 0" class="imgCategorie">
+    <h2>Similar Images</h2>
+    <br>
+    <div>
+      <img *ngFor="let image of similarImages" [src]="image" alt="Similar Image"
+        style="width: 200px; height: auto; margin: 5px;" />
+    </div>
+  </div>
+  <button type="button" (click)="sendImagesTo()">Treatment</button>
+  <div *ngFor="let data of resp" class="color-container">
+    <div *ngFor="let color of data.dominant_color">
+      <div [style.width.px]="50" [style.height.px]="50" [style.backgroundColor]="getDominantColor(color)">
+      </div>
+    </div>
+    <img [src]="'data:image/png;base64,' + data.histogram">
+    <table *ngIf="data.color_moments">
+      <tr>
+        <th>Color</th>
+        <th>Mean</th>
+        <th>Standard Deviation</th>
+        <th>Skewness</th>
+      </tr>
+      <tr *ngFor="let color of getKeys(data.color_moments)">
+        <td>{{color}}</td>
+        <td>{{data.color_moments[color].mean}}</td>
+        <td>{{data.color_moments[color].std}}</td>
+        <td>{{data.color_moments[color].skewness}}</td>
+      </tr>
+    </table> 
+  </div>
+  <!-- <button type="button" (click)="deleteCategory(selectedCategory.id)">Delete</button> -->
+  <button type="button" (click)="deleteSelectedImages()">Delete Selected Images</button>
+</body>
